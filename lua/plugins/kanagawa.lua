@@ -1,9 +1,9 @@
 return {
-	"rebelot/kanagawa.nvim", 
-	config=function()
+	"rebelot/kanagawa.nvim",
+	config = function()
 		require("kanagawa").setup({
-			transaparent=true,
-			overrides=function(colors)
+			transaparent = true,
+			overrides = function(colors)
 				return {
 					["@markup.link.url.markdown_inline"] = { link = "Special" }, -- (url)
 					["@markup.link.label.markdown_inline"] = { link = "WarningMsg" }, -- [label]
@@ -11,14 +11,13 @@ return {
 					["@markup.raw.markdown_inline"] = { link = "String" }, -- `code`
 					["@markup.list.markdown"] = { link = "Function" }, -- + list
 					["@markup.quote.markdown"] = { link = "Error" }, -- > blockcode
-					["@markup.list.checked.markdown"] = { link = "WarningMsg" } -- - [X] checked list item
+					["@markup.list.checked.markdown"] = { link = "WarningMsg" }, -- - [X] checked list item
 				}
-			end
-		});
-		vim.cmd("colorscheme kanagawa");
+			end,
+		})
+		vim.cmd("colorscheme kanagawa")
 	end,
-	build=function()
-		vi.cmd("KanagawaCompile");
+	build = function()
+		vi.cmd("KanagawaCompile")
 	end,
 }
-

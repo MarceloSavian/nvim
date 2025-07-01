@@ -10,8 +10,7 @@ return {
 	-- build = 'cargo build --release',
 	-- If you use nix, you can build from source using latest nightly rust with:
 	-- build = 'nix run .#build-plugin',
-
-	---@module 'blink.cmp'
+	---@moule 'blink.cmp'
 	---@type blink.cmp.Config
 	opts = {
 		-- 'default' (recommended) for mappings similar to built-in completions (C-y to accept)
