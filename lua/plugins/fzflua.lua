@@ -1,8 +1,16 @@
 return {
 	"ibhagwan/fzf-lua",
-
 	dependencies = { "nvim-tree/nvim-web-devicons" },
-	opts = {},
+	opts = {
+
+		file_ignore_patterns = {
+			"node_modules",
+			"%.git/",
+			".sst",
+			"dist",
+			"coverage",
+		},
+	},
 	keys = {
 		{
 			"<leader>ff",
