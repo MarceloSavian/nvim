@@ -26,3 +26,5 @@ vim.keymap.set(
 	[[<C-\><C-n>:q<CR>]],
 	{ noremap = true, silent = true, desc = "Exit and close terminal" }
 )
+
+vim.keymap.set("v", "<leader>y", '"+y', { noremap = true, silent = true })
