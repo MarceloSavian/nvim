@@ -32,6 +32,7 @@ require("lazy").setup({
   install = { colorscheme = { "kanagawa" } },
   -- automatically check for plugin updates
   checker = { enabled = true },
+  rocks = { enabled = false },
 })
 
 require("config.keymap")

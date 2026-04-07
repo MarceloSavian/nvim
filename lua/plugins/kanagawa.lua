@@ -2,7 +2,7 @@ return {
 	"rebelot/kanagawa.nvim",
 	config = function()
 		require("kanagawa").setup({
-			transaparent = true,
+			transparent = false,
 			overrides = function(colors)
 				return {
 					["@markup.link.url.markdown_inline"] = { link = "Special" }, -- (url)

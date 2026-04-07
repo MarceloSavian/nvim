@@ -216,6 +216,7 @@ return {
 			lua_ls = {},
 			terraformls = {},
 			yamlls = {},
+			jdtls = {},
 		}
 
 		-- Ensure the servers and tools above are installed
