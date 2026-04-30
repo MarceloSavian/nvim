@@ -5,6 +5,17 @@ return {
 			transparent = false,
 			overrides = function(colors)
 				return {
+					["@function"] = { fg = colors.palette.crystalBlue },
+					["@function.method"] = { fg = colors.palette.crystalBlue },
+					["@function.call"] = { fg = colors.palette.crystalBlue },
+					["@function.method.call"] = { fg = colors.palette.crystalBlue },
+					["@lsp.type.function"] = { fg = colors.palette.crystalBlue },
+					["@lsp.type.method"] = { fg = colors.palette.crystalBlue },
+					["@lsp.typemod.function.declaration"] = { fg = colors.palette.crystalBlue },
+					["@lsp.typemod.method.declaration"] = { fg = colors.palette.crystalBlue },
+					["@lsp.typemod.function.definition"] = { fg = colors.palette.crystalBlue },
+					["@lsp.typemod.method.definition"] = { fg = colors.palette.crystalBlue },
+					["@lsp.type.member"] = { fg = colors.palette.crystalBlue },
 					["@markup.link.url.markdown_inline"] = { link = "Special" }, -- (url)
 					["@markup.link.label.markdown_inline"] = { link = "WarningMsg" }, -- [label]
 					["@markup.italic.markdown_inline"] = { link = "Exception" }, -- *italic*
@@ -18,6 +29,6 @@ return {
 		vim.cmd("colorscheme kanagawa")
 	end,
 	build = function()
-		vi.cmd("KanagawaCompile")
+		vim.cmd("KanagawaCompile")
 	end,
 }

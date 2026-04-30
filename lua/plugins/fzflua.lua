@@ -1,3 +1,10 @@
+local function find_root(markers)
+	return vim.fs.root(0, markers) or vim.fn.getcwd()
+end
+
+local sub_markers = { "package.json", "pyproject.toml", "go.mod", "Cargo.toml" }
+local mono_markers = { ".git" }
+
 return {
 	"ibhagwan/fzf-lua",
 	dependencies = { "nvim-tree/nvim-web-devicons" },
@@ -6,16 +13,30 @@ return {
 		{
 			"<leader>ff",
 			function()
-				require("fzf-lua").files()
+				require("fzf-lua").files({ cwd = find_root(sub_markers) })
 			end,
-			desc = "Find Fuzy",
+			desc = "Find Files (sub-project)",
+		},
+		{
+			"<leader>fF",
+			function()
+				require("fzf-lua").files({ cwd = find_root(mono_markers) })
+			end,
+			desc = "Find Files (monorepo root)",
 		},
 		{
 			"<leader>fg",
 			function()
-				require("fzf-lua").live_grep()
+				require("fzf-lua").live_grep({ cwd = find_root(sub_markers) })
 			end,
-			desc = "Find Grep",
+			desc = "Live Grep (sub-project)",
+		},
+		{
+			"<leader>fG",
+			function()
+				require("fzf-lua").live_grep({ cwd = find_root(mono_markers) })
+			end,
+			desc = "Live Grep (monorepo root)",
 		},
 		{
 			"<leader>fc",

@@ -18,8 +18,13 @@ vim.keymap.set("n", "<leader>gho", ":Git checkout", { desc = "[G]it[H]ub Check[O
 vim.keymap.set("n", "<leader>ghm", ":Git merge", { desc = "[G]it[H]ub [M]erge" })
 
 vim.keymap.set("n", "<leader>te", function()
+	local buf_dir = vim.fn.expand("%:p:h")
+	local git_root = vim.fn.systemlist("git -C " .. vim.fn.shellescape(buf_dir) .. " rev-parse --show-toplevel")[1]
+	if vim.v.shell_error == 0 and git_root then
+		vim.cmd("lcd " .. vim.fn.fnameescape(git_root))
+	end
 	vim.cmd("terminal")
-end, { noremap = true, silent = true, desc = "Open terminal" })
+end, { noremap = true, silent = true, desc = "Open terminal at git root" })
 vim.keymap.set(
 	"t",
 	"<Esc><Esc>",
@@ -31,6 +36,12 @@ vim.keymap.set("t", "<leader><leader>", function()
 end, { desc = "Open buffers" })
 
 vim.keymap.set("v", "<leader>y", '"+y', { noremap = true, silent = true })
+
+vim.keymap.set("n", "<leader>fpy", function()
+	local path = vim.fn.expand("%:p")
+	vim.fn.setreg("+", path)
+	vim.notify("Copied: " .. path)
+end, { desc = "[F]ile [P]ath [Y]ank (full)" })
 
 vim.keymap.set("n", "<F5>", require("dap").continue)
 vim.keymap.set("n", "<F10>", require("dap").step_over)
