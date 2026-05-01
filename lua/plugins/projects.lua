@@ -34,16 +34,23 @@ local function build_list()
 		table.insert(entries, path .. "|    " .. display)
 	end
 
-	local work_ex = {
+	local work_dedicated = {
 		worktrees = true,
-		["readmes-ai"] = true,
-		emp = true,
-		scripts = true,
-		testdata = true,
 	}
 
+	local work_others = {}
+	local work_main = {}
+	for _, name in ipairs(scan_dir(base .. "/work", work_dedicated)) do
+		local path = base .. "/work/" .. name
+		if vim.uv.fs_stat(path .. "/.git") then
+			table.insert(work_main, name)
+		else
+			table.insert(work_others, name)
+		end
+	end
+
 	header("work")
-	for _, name in ipairs(scan_dir(base .. "/work", work_ex)) do
+	for _, name in ipairs(work_main) do
 		project("work/" .. name, base .. "/work/" .. name)
 	end
 
@@ -53,11 +60,6 @@ local function build_list()
 		for _, proj in ipairs(scan_dir(wt_base .. "/" .. id, nil)) do
 			project("worktrees/" .. id .. "/" .. proj, wt_base .. "/" .. id .. "/" .. proj)
 		end
-	end
-
-	header("readmes-ai")
-	for _, name in ipairs(scan_dir(base .. "/work/readmes-ai", nil)) do
-		project("readmes-ai/" .. name, base .. "/work/readmes-ai/" .. name)
 	end
 
 	header("personal")
@@ -72,6 +74,13 @@ local function build_list()
 			for _, proj in ipairs(scan_dir(pwt .. "/" .. id, nil)) do
 				project("personal/worktrees/" .. id .. "/" .. proj, pwt .. "/" .. id .. "/" .. proj)
 			end
+		end
+	end
+
+	if #work_others > 0 then
+		header("others")
+		for _, name in ipairs(work_others) do
+			project("others/" .. name, base .. "/work/" .. name)
 		end
 	end
 
@@ -138,13 +147,14 @@ local function get_buf_project(filepath)
 	if wt_id then
 		return "worktrees/" .. wt_id .. "/" .. wt_proj, wt_rest:gsub("^/", "")
 	end
-	local rai_folder, rai_rest = filepath:match("^" .. base .. "/work/readmes%-ai/([^/]+)(.*)")
-	if rai_folder then
-		return "readmes-ai/" .. rai_folder, rai_rest:gsub("^/", "")
-	end
 	local work_proj, work_rest = filepath:match("^" .. base .. "/work/([^/]+)(.*)")
 	if work_proj then
-		return "work/" .. work_proj, work_rest:gsub("^/", "")
+		local work_path = base .. "/work/" .. work_proj
+		if vim.uv.fs_stat(work_path .. "/.git") then
+			return "work/" .. work_proj, work_rest:gsub("^/", "")
+		else
+			return "others/" .. work_proj, work_rest:gsub("^/", "")
+		end
 	end
 	local pwt_id, pwt_proj, pwt_rest = filepath:match("^" .. base .. "/personal/worktrees/([^/]+)/([^/]+)(.*)")
 	if pwt_id then
@@ -181,6 +191,18 @@ local function open_buffers()
 
 	table.sort(group_order)
 
+	local cur_project = get_buf_project(vim.api.nvim_buf_get_name(vim.api.nvim_get_current_buf()))
+	if cur_project then
+		for i, proj in ipairs(group_order) do
+			if proj == cur_project then
+				table.remove(group_order, i)
+				table.insert(group_order, 1, cur_project)
+				break
+			end
+		end
+	end
+
+	local alt_bufnr = vim.fn.bufnr("#")
 	local entries = {}
 
 	local function header(label)
@@ -188,19 +210,43 @@ local function open_buffers()
 		table.insert(entries, "|" .. h)
 	end
 
+	local function add_buf(buf)
+		local modified = vim.bo[buf.bufnr].modified and " ●" or ""
+		table.insert(entries, tostring(buf.bufnr) .. "|    " .. buf.display .. modified)
+	end
+
 	for _, proj in ipairs(group_order) do
 		header(proj)
 		for _, buf in ipairs(grouped[proj]) do
-			local modified = vim.bo[buf.bufnr].modified and " ●" or ""
-			table.insert(entries, tostring(buf.bufnr) .. "|    " .. buf.display .. modified)
+			if buf.bufnr ~= alt_bufnr then
+				add_buf(buf)
+			end
 		end
 	end
 
 	if #other > 0 then
 		header("other")
 		for _, buf in ipairs(other) do
-			local modified = vim.bo[buf.bufnr].modified and " ●" or ""
-			table.insert(entries, tostring(buf.bufnr) .. "|    " .. buf.display .. modified)
+			if buf.bufnr ~= alt_bufnr then
+				add_buf(buf)
+			end
+		end
+	end
+
+	-- Prepend the alt buffer so fzf starts with the cursor on it
+	if alt_bufnr and alt_bufnr > 0 and vim.api.nvim_buf_is_loaded(alt_bufnr) then
+		local alt_name = vim.api.nvim_buf_get_name(alt_bufnr)
+		if alt_name ~= "" then
+			local project, rel = get_buf_project(alt_name)
+			local display
+			if project then
+				local rel_part = rel ~= "" and rel or vim.fn.fnamemodify(alt_name, ":t")
+				display = project .. "/" .. rel_part
+			else
+				display = vim.fn.fnamemodify(alt_name, ":~")
+			end
+			local modified = vim.bo[alt_bufnr].modified and " ●" or ""
+			table.insert(entries, 1, tostring(alt_bufnr) .. "|    " .. display .. modified)
 		end
 	end
 

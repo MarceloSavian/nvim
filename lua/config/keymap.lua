@@ -19,12 +19,16 @@ vim.keymap.set("n", "<leader>ghm", ":Git merge", { desc = "[G]it[H]ub [M]erge" }
 
 vim.keymap.set("n", "<leader>te", function()
 	local buf_dir = vim.fn.expand("%:p:h")
-	local git_root = vim.fn.systemlist("git -C " .. vim.fn.shellescape(buf_dir) .. " rev-parse --show-toplevel")[1]
-	if vim.v.shell_error == 0 and git_root then
-		vim.cmd("lcd " .. vim.fn.fnameescape(git_root))
+	if buf_dir:find("/scripts") then
+		vim.cmd("lcd " .. vim.fn.fnameescape(buf_dir))
+	else
+		local git_root = vim.fn.systemlist("git -C " .. vim.fn.shellescape(buf_dir) .. " rev-parse --show-toplevel")[1]
+		if vim.v.shell_error == 0 and git_root then
+			vim.cmd("lcd " .. vim.fn.fnameescape(git_root))
+		end
 	end
 	vim.cmd("terminal")
-end, { noremap = true, silent = true, desc = "Open terminal at git root" })
+end, { noremap = true, silent = true, desc = "Open terminal at git root or script dir" })
 vim.keymap.set(
 	"t",
 	"<Esc><Esc>",
