@@ -261,8 +261,8 @@ local function open_buffers()
 			title = " Buffers ",
 			title_pos = "center",
 			height = 0.6,
-			width = 0.55,
-			preview = { hidden = "hidden" },
+			width = 0.75,
+			preview = { side = "right", ratio = 0.5 },
 		},
 		fzf_opts = {
 			["--no-sort"] = "",
@@ -284,9 +284,25 @@ local function open_buffers()
 					vim.api.nvim_set_current_buf(bufnr)
 				end
 			end,
+			["ctrl-x"] = function(selected)
+				if not selected or not selected[1] then
+					return
+				end
+				local bufnr_str = selected[1]:match("^([^|]+)|")
+				if not bufnr_str or bufnr_str == "" then
+					return
+				end
+				local bufnr = tonumber(bufnr_str)
+				if bufnr then
+					vim.api.nvim_buf_delete(bufnr, { force = false })
+				end
+				open_buffers()
+			end,
 		},
 	})
 end
+
+_G._open_buffers = open_buffers
 
 vim.keymap.set("n", "<leader>p", open_projects, { desc = "Open Projects" })
 vim.keymap.set("n", "<leader><leader>", open_buffers, { desc = "Find Buffers by Project" })

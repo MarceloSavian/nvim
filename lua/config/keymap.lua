@@ -36,7 +36,14 @@ vim.keymap.set(
 	{ noremap = true, silent = true, desc = "Exit and close terminal" }
 )
 vim.keymap.set("t", "<leader><leader>", function()
-	require("fzf-lua").buffers()
+	vim.cmd("stopinsert")
+	vim.schedule(function()
+		if _G._open_buffers then
+			_G._open_buffers()
+		else
+			require("fzf-lua").buffers()
+		end
+	end)
 end, { desc = "Open buffers" })
 
 vim.keymap.set("v", "<leader>y", '"+y', { noremap = true, silent = true })
