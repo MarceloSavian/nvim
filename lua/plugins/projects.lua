@@ -207,12 +207,13 @@ local function open_buffers()
 
 	local function header(label)
 		local h = string.format("\27[1;34m  ▸ %s\27[0m", label)
-		table.insert(entries, "|" .. h)
+		table.insert(entries, "||" .. h)
 	end
 
 	local function add_buf(buf)
 		local modified = vim.bo[buf.bufnr].modified and " ●" or ""
-		table.insert(entries, tostring(buf.bufnr) .. "|    " .. buf.display .. modified)
+		local filepath = vim.api.nvim_buf_get_name(buf.bufnr)
+		table.insert(entries, tostring(buf.bufnr) .. "|" .. filepath .. "|    " .. buf.display .. modified)
 	end
 
 	for _, proj in ipairs(group_order) do
@@ -246,7 +247,7 @@ local function open_buffers()
 				display = vim.fn.fnamemodify(alt_name, ":~")
 			end
 			local modified = vim.bo[alt_bufnr].modified and " ●" or ""
-			table.insert(entries, 1, tostring(alt_bufnr) .. "|    " .. display .. modified)
+			table.insert(entries, 1, tostring(alt_bufnr) .. "|" .. alt_name .. "|    " .. display .. modified)
 		end
 	end
 
@@ -268,7 +269,9 @@ local function open_buffers()
 			["--no-sort"] = "",
 			["--ansi"] = "",
 			["--delimiter"] = "|",
-			["--with-nth"] = "2..",
+			["--with-nth"] = "3..",
+			["--preview"] = "f={2}; [ -f \"$f\" ] && cat -n \"$f\" || echo 'No preview'",
+			["--preview-window"] = "right:50%",
 		},
 		actions = {
 			["default"] = function(selected)
