@@ -308,6 +308,6 @@ end
 _G._open_buffers = open_buffers
 
 vim.keymap.set("n", "<leader>p", open_projects, { desc = "Open Projects" })
-vim.keymap.set("n", "<leader><leader>", open_buffers, { desc = "Find Buffers by Project" })
+vim.keymap.set("n", "<leader><leader>", function() require("fzf-lua").buffers() end, { desc = "Find Buffers" })
 
 return {}

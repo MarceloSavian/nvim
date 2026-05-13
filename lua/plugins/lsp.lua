@@ -217,6 +217,15 @@ return {
 			terraformls = {},
 			yamlls = {},
 			jdtls = {},
+			robotcode = {
+				cmd = { "/Library/Frameworks/Python.framework/Versions/3.12/bin/robotcode", "language-server" },
+				before_init = function(_, config)
+					local venv_rc = config.root_dir .. "/.venv/bin/robotcode"
+					if vim.fn.executable(venv_rc) == 1 then
+						config.cmd = { venv_rc, "language-server" }
+					end
+				end,
+			},
 		}
 
 		-- Ensure the servers and tools above are installed
@@ -232,7 +241,7 @@ return {
 		--
 		-- You can add other tools here that you want Mason to install
 		-- for you, so that they are available from within Neovim.
-		local ensure_installed = vim.tbl_keys(servers or {})
+		local ensure_installed = vim.tbl_filter(function(s) return s ~= "robotcode" end, vim.tbl_keys(servers or {}))
 		vim.list_extend(ensure_installed, {
 			"stylua", -- Used to format Lua code
 			"prettierd",
@@ -258,6 +267,9 @@ return {
 				vim.lsp.config(server_name, server)
 			end
 		end
+
+		-- Servers not managed by Mason must be enabled explicitly
+		vim.lsp.enable("robotcode")
 
 		require("mason-lspconfig").setup({
 			ensure_installed = {}, -- Kickstart populates installs via mason-tool-installer
