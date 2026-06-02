@@ -37,3 +37,4 @@ vim.opt.spelllang = { "en_us" }
 
 vim.opt.termguicolors = true
 vim.opt.autoread = true
+vim.opt.completeopt = { "menu", "menuone", "noselect", "noinsert" }

@@ -18,7 +18,15 @@ vim.api.nvim_create_autocmd("LspAttach", {
 		map("gl", function() vim.diagnostic.open_float({ focusable = true, focus = true }) end, "Open Diagnostic")
 
 		vim.keymap.set("i", "<C-Space>", "<C-x><C-o>", { buffer = event.buf })
-		vim.keymap.set("i", "<CR>", function()
+
+		vim.api.nvim_create_autocmd("InsertCharPre", {
+			buffer = event.buf,
+			callback = function()
+				vim.lsp.completion.get()
+			end,
+		})
+
+vim.keymap.set("i", "<CR>", function()
 			return vim.fn.pumvisible() == 1 and "<C-y>" or "<CR>"
 		end, { buffer = event.buf, expr = true })
 		vim.keymap.set("i", "<C-j>", function()
