@@ -8,10 +8,8 @@ vim.pack.add({
 	"https://github.com/kdheepak/lazygit.nvim",
 	"https://github.com/folke/which-key.nvim",
 	"https://github.com/lewis6991/gitsigns.nvim",
-	"https://github.com/williamboman/mason.nvim",
 })
 
-require("plugins.mason")
 require("plugins.oil")
 require("plugins.treesitter")
 require("plugins.fzf-lua")

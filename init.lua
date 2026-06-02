@@ -9,5 +9,9 @@ require("config.keymaps")
 
 require("lsp.typescript")
 require("lsp.rust")
+require("lsp.robotcode")
+require("lsp.python")
+require("lsp.lua")
+require("lsp.terraform")
 
 vim.cmd.colorscheme("tokyonight-night")
