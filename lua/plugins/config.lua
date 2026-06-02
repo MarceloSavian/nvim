@@ -1,0 +1,19 @@
+vim.pack.add({
+	"https://github.com/folke/tokyonight.nvim",
+	"https://github.com/echasnovski/mini.icons",
+	"https://github.com/stevearc/oil.nvim",
+	"https://github.com/nvim-treesitter/nvim-treesitter",
+	"https://github.com/nvim-tree/nvim-web-devicons",
+	"https://github.com/ibhagwan/fzf-lua",
+	"https://github.com/kdheepak/lazygit.nvim",
+	"https://github.com/folke/which-key.nvim",
+	"https://github.com/lewis6991/gitsigns.nvim",
+})
+
+require("plugins.oil")
+require("plugins.treesitter")
+require("plugins.fzf-lua")
+require("plugins.lazygit")
+require("plugins.which-key")
+require("plugins.gitsigns")
+require("plugins.projects")
