@@ -27,3 +27,7 @@ vim.keymap.set("t", "<leader><leader>", function()
 	end)
 end, { desc = "Open buffers" })
 
+vim.keymap.set("n", "<leader>/", function()
+	require("fzf-lua").blines()
+end, { desc = "Search in buffer" })
+
