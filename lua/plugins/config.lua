@@ -8,6 +8,8 @@ vim.pack.add({
 	"https://github.com/kdheepak/lazygit.nvim",
 	"https://github.com/folke/which-key.nvim",
 	"https://github.com/lewis6991/gitsigns.nvim",
+	"https://github.com/mechatroner/rainbow_csv",
+	"https://github.com/MeanderingProgrammer/render-markdown.nvim",
 })
 
 require("plugins.oil")
@@ -16,4 +18,6 @@ require("plugins.fzf-lua")
 require("plugins.lazygit")
 require("plugins.which-key")
 require("plugins.gitsigns")
+require("plugins.rainbow-csv")
+require("plugins.render-markdown")
 require("plugins.projects")

@@ -13,5 +13,9 @@ require("lsp.robotcode")
 require("lsp.python")
 require("lsp.lua")
 require("lsp.terraform")
+require("lsp.markdown")
+require("lsp.json")
+
+pcall(require, "local")
 
 vim.cmd.colorscheme("tokyonight-night")

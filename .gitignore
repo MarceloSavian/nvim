@@ -1,0 +1,4 @@
+lua/local.lua
+lua/lsp/nowrules.lua
+parser/
+queries/

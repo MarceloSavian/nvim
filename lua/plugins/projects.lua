@@ -22,6 +22,30 @@ local function scan_dir(path, exclude)
 	return items
 end
 
+local function scan_worktrees(path, prefix, entries)
+
+	for _, name in ipairs(scan_dir(path)) do
+		local child = path .. "/" .. name
+		if vim.uv.fs_stat(child .. "/.git") then
+			local display_parts = vim.deepcopy(prefix)
+			table.insert(display_parts, name)
+			local display_path = table.concat(display_parts, "/")
+			table.insert(entries, { display = "worktrees/" .. display_path, path = child })
+		elseif name == "documentation" then
+			local display_parts = vim.deepcopy(prefix)
+			table.insert(display_parts, name)
+			table.insert(entries, {
+				display = "worktrees/" .. table.concat(display_parts, "/"),
+				path = child,
+			})
+		else
+			local child_prefix = vim.deepcopy(prefix)
+			table.insert(child_prefix, name)
+			scan_worktrees(child, child_prefix, entries)
+		end
+	end
+end
+
 local function build_list()
 	local entries = {}
 
@@ -56,10 +80,10 @@ local function build_list()
 
 	header("worktrees")
 	local wt_base = base .. "/work/worktrees"
-	for _, id in ipairs(scan_dir(wt_base, nil)) do
-		for _, proj in ipairs(scan_dir(wt_base .. "/" .. id, nil)) do
-			project("worktrees/" .. id .. "/" .. proj, wt_base .. "/" .. id .. "/" .. proj)
-		end
+	local worktree_entries = {}
+	scan_worktrees(wt_base, {}, worktree_entries)
+	for _, entry in ipairs(worktree_entries) do
+		project(entry.display, entry.path)
 	end
 
 	header("personal")
@@ -70,10 +94,10 @@ local function build_list()
 	local pwt = base .. "/personal/worktrees"
 	if vim.uv.fs_stat(pwt) then
 		header("personal worktrees")
-		for _, id in ipairs(scan_dir(pwt, nil)) do
-			for _, proj in ipairs(scan_dir(pwt .. "/" .. id, nil)) do
-				project("personal/worktrees/" .. id .. "/" .. proj, pwt .. "/" .. id .. "/" .. proj)
-			end
+		local personal_worktree_entries = {}
+		scan_worktrees(pwt, {}, personal_worktree_entries)
+		for _, entry in ipairs(personal_worktree_entries) do
+			project("personal/" .. entry.display, entry.path)
 		end
 	end
 
@@ -143,9 +167,19 @@ local function get_buf_project(filepath)
 	if not filepath or filepath == "" then
 		return nil, nil
 	end
-	local wt_id, wt_proj, wt_rest = filepath:match("^" .. base .. "/work/worktrees/([^/]+)/([^/]+)(.*)")
-	if wt_id then
-		return "worktrees/" .. wt_id .. "/" .. wt_proj, wt_rest:gsub("^/", "")
+	local wt_root = base .. "/work/worktrees/"
+	if vim.startswith(filepath, wt_root) then
+		local relative = filepath:sub(#wt_root + 1)
+		local parts = vim.split(relative, "/", { plain = true })
+		local candidate = wt_root:sub(1, -2)
+		for i, part in ipairs(parts) do
+			candidate = candidate .. "/" .. part
+			if vim.uv.fs_stat(candidate .. "/.git") then
+				local project_path = table.concat(vim.list_slice(parts, 1, i), "/")
+				local rest = table.concat(vim.list_slice(parts, i + 1), "/")
+				return "worktrees/" .. project_path, rest
+			end
+		end
 	end
 	local work_proj, work_rest = filepath:match("^" .. base .. "/work/([^/]+)(.*)")
 	if work_proj then
@@ -156,9 +190,19 @@ local function get_buf_project(filepath)
 			return "others/" .. work_proj, work_rest:gsub("^/", "")
 		end
 	end
-	local pwt_id, pwt_proj, pwt_rest = filepath:match("^" .. base .. "/personal/worktrees/([^/]+)/([^/]+)(.*)")
-	if pwt_id then
-		return "personal worktrees/" .. pwt_id .. "/" .. pwt_proj, pwt_rest:gsub("^/", "")
+	local personal_wt_root = base .. "/personal/worktrees/"
+	if vim.startswith(filepath, personal_wt_root) then
+		local relative = filepath:sub(#personal_wt_root + 1)
+		local parts = vim.split(relative, "/", { plain = true })
+		local candidate = personal_wt_root:sub(1, -2)
+		for i, part in ipairs(parts) do
+			candidate = candidate .. "/" .. part
+			if vim.uv.fs_stat(candidate .. "/.git") then
+				local project_path = table.concat(vim.list_slice(parts, 1, i), "/")
+				local rest = table.concat(vim.list_slice(parts, i + 1), "/")
+				return "personal worktrees/" .. project_path, rest
+			end
+		end
 	end
 	local pers_proj, pers_rest = filepath:match("^" .. base .. "/personal/([^/]+)(.*)")
 	if pers_proj then
